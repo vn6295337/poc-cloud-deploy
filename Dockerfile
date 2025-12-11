@@ -9,6 +9,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code from src directory
 COPY src/ ./src/
 
+# Copy startup script
+COPY start-app.sh .
+
 # Make startup script executable
 RUN chmod +x start-app.sh
 
