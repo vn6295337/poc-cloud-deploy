@@ -608,13 +608,13 @@ DASHBOARD_HTML = """
     function clearVisual() {
       visualizer.innerHTML = '';
       logEl.textContent = '> System ready.\n> Waiting for input...\n';
-      metricLatency.textContent = '—';
-      metricProvider.textContent = '—';
-      metricTokensConsumed.textContent = '—';
-      metricTokensMax.textContent = '—';
-      metricTokensSaved.textContent = '—';
+      metricLatency.textContent = '---';
+      metricProvider.textContent = '---';
+      metricTokensConsumed.textContent = '---';
+      metricTokensMax.textContent = '---';
+      metricTokensSaved.textContent = '---';
       metricCostSaved.textContent = '';
-      metricRate.textContent = '—';
+      metricRate.textContent = '---';
       providerElems.statusGemini.textContent = 'idle';
       providerElems.statusGroq.textContent = 'idle';
       providerElems.statusOpen.textContent = 'idle';
@@ -725,8 +725,8 @@ DASHBOARD_HTML = """
           highlightElement('.card:has(#metric-latency)', 'pulse');
           addCommentary(`Request terminated. Zero resources consumed.`);
           addCommentary('Tokens saved: ' + maxTokens + ' (~$' + (maxTokens * 0.00003).toFixed(4) + ')');
-          metricProvider.textContent = '—';
-          metricRate.textContent = '—';
+          metricProvider.textContent = '---';
+          metricRate.textContent = '---';
           runStatus.textContent = 'Blocked';
           lastRunData.final = 'blocked';
           break;
@@ -856,7 +856,7 @@ DASHBOARD_HTML = """
 
     document.getElementById('copy-snippet')?.addEventListener('click', ()=>{
       if (!lastRunData) { appendLog('> Nothing to copy. Run a card first.'); return; }
-      const snippet = `Title: ${SCENARIOS[lastRunData.scenario].title}\nResult: ${lastRunData.final}\nProvider: ${lastRunData.provider||'—'}\nLatency: ${lastRunData.latency||'—'}ms\nTokens: ${lastRunData.tokensConsumed||0}/${metricTokensMax.textContent}`;
+      const snippet = `Title: ${SCENARIOS[lastRunData.scenario].title}\nResult: ${lastRunData.final}\nProvider: ${lastRunData.provider||'---'}\nLatency: ${lastRunData.latency||'---'}ms\nTokens: ${lastRunData.tokensConsumed||0}/${metricTokensMax.textContent}`;
       navigator.clipboard.writeText(snippet).then(()=> appendLog('> Exec snippet copied.'));
     });
 
