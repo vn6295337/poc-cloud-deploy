@@ -825,7 +825,14 @@ DASHBOARD_HTML = """
           { id: "auth", label: "AUTH", action: () => ({ status: apiKey && apiKey !== 'secure-demo-ak7x9...' ? "pass" : "fail", reason: "missing or invalid key" }) },
           { id: "input", label: "INPUT VALIDATION", action: () => ({ status: customPrompt.trim() ? "pass" : "fail", reason: "empty prompt" }) },
           { id: "injection", label: "INJECTION CHECK", action: () => {
-            const hasInjection = /ignore.*previous|disregard.*instructions/i.test(customPrompt);
+            // Match patterns from Python INJECTION_PATTERNS
+            const patterns = [
+              /ignore\s+(all\s+)?(previous|above|prior)\s+instructions?/i,
+              /disregard\s+(all\s+)?(previous|above|prior)\s+instructions?/i,
+              /you\s+are\s+now/i,
+              /system\s*:\s*/i
+            ];
+            const hasInjection = patterns.some(pattern => pattern.test(customPrompt));
             return hasInjection ? { status: "block", pattern: "injection pattern detected" } : { status: "pass" };
           }},
           { id: "provider", label: "PROVIDER CASCADE", action: () => ({ status: "fallback", path: ["gemini:success"] }) }
