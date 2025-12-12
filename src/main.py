@@ -553,13 +553,13 @@ DASHBOARD_HTML = """
         'INPUT VALIDATION': {
           start: 'Validating input format and constraints...',
           pass: 'Input validation passed.',
-          fail: `BLOCKED: ${reason || 'Input validation failed.'}`,
+          fail: 'BLOCKED: Input validation failed.',
           highlight: '#input-prompt'
         },
         'INJECTION CHECK': {
           start: 'Scanning prompt for malicious patterns...',
           pass: 'No threats detected.',
-          block: `BLOCKED: Injection pattern detected (${reason || 'unknown'}).`,
+          block: 'BLOCKED: Injection pattern detected.',
           highlight: '#input-prompt'
         },
         'RATE LIMIT CHECK': {
@@ -720,11 +720,11 @@ DASHBOARD_HTML = """
           lastRunData.tokensSaved = maxTokens;
           metricTokensConsumed.textContent = lastRunData.tokensConsumed;
           metricTokensSaved.textContent = lastRunData.tokensSaved;
-          metricCostSaved.textContent = `(~$${(lastRunData.tokensSaved * 0.00003).toFixed(4)})`;
+          metricCostSaved.textContent = '(~$' + (lastRunData.tokensSaved * 0.00003).toFixed(4) + ')';
           // Highlight metrics to show savings
           highlightElement('.card:has(#metric-latency)', 'pulse');
           addCommentary(`Request terminated. Zero resources consumed.`);
-          addCommentary(`Tokens saved: ${maxTokens} (~$${(maxTokens * 0.00003).toFixed(4)})`);
+          addCommentary('Tokens saved: ' + maxTokens + ' (~$' + (maxTokens * 0.00003).toFixed(4) + ')');
           metricProvider.textContent = '—';
           metricRate.textContent = '—';
           runStatus.textContent = 'Blocked';
@@ -763,7 +763,7 @@ DASHBOARD_HTML = """
               metricLatency.textContent = lastRunData.latency + ' ms';
               metricTokensConsumed.textContent = lastRunData.tokensConsumed;
               metricTokensSaved.textContent = lastRunData.tokensSaved;
-              metricCostSaved.textContent = lastRunData.tokensSaved > 0 ? `(~$${(lastRunData.tokensSaved * 0.00003).toFixed(4)})` : '';
+              metricCostSaved.textContent = lastRunData.tokensSaved > 0 ? '(~$' + (lastRunData.tokensSaved * 0.00003).toFixed(4) + ')' : '';
               metricRate.textContent = '7/10';
               // Highlight metrics on success
               highlightElement('.card:has(#metric-latency)', 'pulse');
