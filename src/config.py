@@ -177,18 +177,7 @@ DASHBOARD_HTML = """
     <!-- ===== TIER 2: Horizontal feature cards as status bar (4 equal columns) -->
     <div class="feature-cards">
       <div class="feature-card card">
-        <div class="feature-icon">Security</div>
-        <div class="grid grid-cols-2 gap-1 mt-2">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🛡️ Injection Attempt</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🔒</button>
-        </div>
-        <div class="grid grid-cols-2 gap-1 mt-1">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">❌ Malformed Input</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🚪</button>
-        </div>
-      </div>
-      <div class="feature-card card">
-        <div class="feature-icon">Infrastructure</div>
+        <div class="feature-icon">Fault-Tolerant LLM Mesh</div>
         <div class="grid grid-cols-2 gap-1 mt-2">
           <button class="card-button p-1 text-xs rounded hover:bg-slate-700">✅ Normal Request</button>
           <button class="card-button p-1 text-xs rounded hover:bg-slate-700">⚙️</button>
@@ -199,25 +188,36 @@ DASHBOARD_HTML = """
         </div>
       </div>
       <div class="feature-card card">
-        <div class="feature-icon">Governance</div>
+        <div class="feature-icon">Zero Trust Security</div>
         <div class="grid grid-cols-2 gap-1 mt-2">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📋</button>
+          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🛡️ Injection Attempt</button>
+          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🔒</button>
+        </div>
+        <div class="grid grid-cols-2 gap-1 mt-1">
+          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">❌ Malformed Input</button>
+          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🚪</button>
+        </div>
+      </div>
+      <div class="feature-card card">
+        <div class="feature-icon">Adaptive Rate Control</div>
+        <div class="grid grid-cols-2 gap-1 mt-2">
+          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">⏱️ Rate Limit Test</button>
           <button class="card-button p-1 text-xs rounded hover:bg-slate-700">⚖️</button>
         </div>
         <div class="grid grid-cols-2 gap-1 mt-1">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">⏱️ Rate Limit Test</button>
+          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📋</button>
           <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📊</button>
         </div>
       </div>
       <div class="feature-card card">
-        <div class="feature-icon">Multi-LLM</div>
+        <div class="feature-icon">Glass Box Observability</div>
         <div class="grid grid-cols-2 gap-1 mt-2">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🤖</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🔄</button>
+          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📥</button>
+          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📋</button>
         </div>
         <div class="grid grid-cols-2 gap-1 mt-1">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">💬</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🌍</button>
+          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📊</button>
+          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🔍</button>
         </div>
       </div>
     </div>
