@@ -178,46 +178,28 @@ DASHBOARD_HTML = """
     <div class="feature-cards">
       <div class="feature-card card">
         <div class="feature-icon">Fault-Tolerant LLM Mesh</div>
-        <div class="grid grid-cols-2 gap-1 mt-2">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">✅ Normal Request</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">⚙️</button>
-        </div>
-        <div class="grid grid-cols-2 gap-1 mt-1">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🌐</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">⚡</button>
+        <div class="mt-2">
+          <button data-scenario="normal" class="card-button p-1.5 text-xs rounded hover:bg-slate-700 w-full">Normal Request</button>
         </div>
       </div>
       <div class="feature-card card">
         <div class="feature-icon">Zero Trust Security</div>
-        <div class="grid grid-cols-2 gap-1 mt-2">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🛡️ Injection Attempt</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🔒</button>
-        </div>
-        <div class="grid grid-cols-2 gap-1 mt-1">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">❌ Malformed Input</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🚪</button>
+        <div class="grid grid-cols-2 gap-1.5 mt-2">
+          <button data-scenario="injection" class="card-button p-1.5 text-xs rounded hover:bg-slate-700">Injection Block</button>
+          <button data-scenario="malformed" class="card-button p-1.5 text-xs rounded hover:bg-slate-700">Input Validation</button>
         </div>
       </div>
       <div class="feature-card card">
         <div class="feature-icon">Adaptive Rate Control</div>
-        <div class="grid grid-cols-2 gap-1 mt-2">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">⏱️ Rate Limit Test</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">⚖️</button>
-        </div>
-        <div class="grid grid-cols-2 gap-1 mt-1">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📋</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📊</button>
+        <div class="mt-2">
+          <button data-scenario="rate-limit" class="card-button p-1.5 text-xs rounded hover:bg-slate-700 w-full">Rate Limit Test</button>
         </div>
       </div>
       <div class="feature-card card">
         <div class="feature-icon">Glass Box Observability</div>
-        <div class="grid grid-cols-2 gap-1 mt-2">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📥</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📋</button>
-        </div>
-        <div class="grid grid-cols-2 gap-1 mt-1">
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">📊</button>
-          <button class="card-button p-1 text-xs rounded hover:bg-slate-700">🔍</button>
+        <div class="grid grid-cols-2 gap-1.5 mt-2">
+          <button id="download-raw-card" class="card-button p-1.5 text-xs rounded hover:bg-slate-700">Download</button>
+          <button id="copy-snippet-card" class="card-button p-1.5 text-xs rounded hover:bg-slate-700">Copy</button>
         </div>
       </div>
     </div>
@@ -920,6 +902,15 @@ DASHBOARD_HTML = """
       if (!lastRunData) { appendLog('> Nothing to copy. Run a card first.'); return; }
       const snippet = 'Title: ' + SCENARIOS[lastRunData.scenario].title + '\\\\nResult: ' + lastRunData.final + '\\\\nProvider: ' + (lastRunData.provider||'---') + '\\\\nLatency: ' + (lastRunData.latency||'---') + 'ms\\\\nTokens: ' + (lastRunData.tokensConsumed||0) + '/' + metricTokensMax.textContent;
       navigator.clipboard.writeText(snippet).then(()=> appendLog('> Exec snippet copied.'));
+    });
+
+    // Feature card buttons - delegate to main actions
+    document.getElementById('download-raw-card')?.addEventListener('click', ()=>{
+      document.getElementById('download-raw')?.click();
+    });
+
+    document.getElementById('copy-snippet-card')?.addEventListener('click', ()=>{
+      document.getElementById('copy-snippet')?.click();
     });
 
     // Token counter update
