@@ -177,7 +177,8 @@ DASHBOARD_HTML = """
         <div class="feature-icon">Fault-Tolerant LLM Mesh</div>
         <div class="mt-2">
           <button data-scenario="normal" class="card-button p-1.5 text-xs rounded bg-slate-800 hover:bg-slate-700 w-full h-12 flex flex-col items-center justify-center leading-tight">
-            <span>Resilience</span>
+            <span>Prove</span>
+            <span>Uptime</span>
           </button>
         </div>
       </div>
@@ -185,8 +186,8 @@ DASHBOARD_HTML = """
         <div class="feature-icon">Zero-Trust Security</div>
         <div class="mt-2">
           <button data-scenario="injection" class="card-button p-1.5 text-xs rounded bg-slate-800 hover:bg-slate-700 w-full h-12 flex flex-col items-center justify-center leading-tight">
-            <span>Threats</span>
-            <span>Blocked</span>
+            <span>Protect</span>
+            <span>Security</span>
           </button>
         </div>
       </div>
@@ -194,7 +195,8 @@ DASHBOARD_HTML = """
         <div class="feature-icon">Adaptive Cost Control</div>
         <div class="mt-2">
           <button data-scenario="rate-limit" class="card-button p-1.5 text-xs rounded bg-slate-800 hover:bg-slate-700 w-full h-12 flex flex-col items-center justify-center leading-tight">
-            <span>Savings</span>
+            <span>Optimize</span>
+            <span>Costs</span>
           </button>
         </div>
       </div>
@@ -202,8 +204,8 @@ DASHBOARD_HTML = """
         <div class="feature-icon">Glass Box Observability</div>
         <div class="mt-2">
           <button id="download-raw-card" class="card-button p-1.5 text-xs rounded bg-slate-800 hover:bg-slate-700 w-full h-12 flex flex-col items-center justify-center leading-tight">
-            <span>Avg</span>
-            <span>Latency</span>
+            <span>Measure</span>
+            <span>Speed</span>
           </button>
         </div>
       </div>
