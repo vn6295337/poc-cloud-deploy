@@ -253,79 +253,75 @@ DASHBOARD_HTML = """
         </div>
       </div>
 
-      <!-- REQUEST LIFECYCLE - Pipeline Visualization (50% - 2 columns) -->
+      <!-- REQUEST LIFECYCLE – Vertical, Compact -->
       <div class="lg:col-span-2">
-        <div class="card p-2 relative overflow-hidden flex flex-col items-center justify-center">
-  <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
-  
-  <div class="w-full flex flex-col items-center justify-center relative z-10 px-4">
-    <h2 class="font-mono text-xs text-slate-400 mb-4 tracking-widest uppercase text-center">Request Lifecycle</h2>
+        <div class="card p-2 relative overflow-hidden">
+          <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10"></div>
 
-    <div class="flex items-start justify-between w-full max-w-3xl px-2" style="align-items: flex-start;">
+          <div class="relative z-10 flex gap-3">
 
-      <!-- Auth Step -->
-      <div id="step-auth" class="flex flex-col items-center justify-start transition-all duration-300 opacity-50" style="width: 80px; height: 78px;">
-        <div class="w-14 h-14 rounded-lg border-2 border-slate-700 bg-slate-900 flex items-center justify-center mb-1.5 shadow-lg transition-all duration-300">
-          <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 28px; line-height: 1;">🔑</span>
-        </div>
-        <span class="uppercase tracking-wider font-semibold text-slate-500" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 16px; font-size: 9px; line-height: 1; text-align: center;">Auth</span>
-      </div>
+            <!-- Vertical Lifecycle -->
+            <div class="flex flex-col items-center justify-start">
 
-      <!-- Connector 1 -->
-      <div class="flex-1 flex items-center justify-center px-3" style="margin-top: 27px;">
-        <div class="h-0.5 w-full bg-slate-800 relative">
-          <div class="absolute inset-0 bg-blue-500 w-0 transition-all duration-500" id="line-1"></div>
-        </div>
-      </div>
+              <!-- Auth -->
+              <div id="step-auth" class="flex flex-col items-center opacity-50" style="width:60px;">
+                <div class="w-10 h-10 rounded-md border-2 border-slate-700 bg-slate-900 flex items-center justify-center mb-1">
+                  <span style="font-size:20px;">🔑</span>
+                </div>
+                <span class="text-micro uppercase tracking-wider text-slate-500">Auth</span>
+              </div>
 
-      <!-- Guardrail Step -->
-      <div id="step-guard" class="flex flex-col items-center justify-start transition-all duration-300 opacity-50" style="width: 80px; height: 78px;">
-        <div class="w-14 h-14 rounded-lg border-2 border-slate-700 bg-slate-900 flex items-center justify-center mb-1.5 shadow-lg transition-all duration-300">
-          <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 28px; line-height: 1;">🛡️</span>
-        </div>
-        <span class="uppercase tracking-wider font-semibold text-slate-500" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 16px; font-size: 9px; line-height: 1; text-align: center;">Guardrail</span>
-      </div>
+              <div class="h-4 w-0.5 bg-slate-800 my-1 relative">
+                <div id="line-1" class="absolute top-0 left-0 w-full h-0 bg-blue-500 transition-all duration-500"></div>
+              </div>
 
-      <!-- Connector 2 -->
-      <div class="flex-1 flex items-center justify-center px-3" style="margin-top: 27px;">
-        <div class="h-0.5 w-full bg-slate-800 relative">
-          <div class="absolute inset-0 bg-blue-500 w-0 transition-all duration-500" id="line-2"></div>
-        </div>
-      </div>
+              <!-- Guard -->
+              <div id="step-guard" class="flex flex-col items-center opacity-50" style="width:60px;">
+                <div class="w-10 h-10 rounded-md border-2 border-slate-700 bg-slate-900 flex items-center justify-center mb-1">
+                  <span style="font-size:20px;">🛡️</span>
+                </div>
+                <span class="text-micro uppercase tracking-wider text-slate-500">Guard</span>
+              </div>
 
-      <!-- Router Step -->
-      <div id="step-router" class="flex flex-col items-center justify-start transition-all duration-300 opacity-50" style="width: 80px; height: 78px;">
-        <div class="w-14 h-14 rounded-lg border-2 border-slate-700 bg-slate-900 flex items-center justify-center mb-1.5 shadow-lg transition-all duration-300">
-          <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 28px; line-height: 1;">🔀</span>
-        </div>
-        <span class="uppercase tracking-wider font-semibold text-slate-500" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 16px; font-size: 9px; line-height: 1; text-align: center;">Router</span>
-      </div>
+              <div class="h-4 w-0.5 bg-slate-800 my-1 relative">
+                <div id="line-2" class="absolute top-0 left-0 w-full h-0 bg-blue-500 transition-all duration-500"></div>
+              </div>
 
-      <!-- Connector 3 -->
-      <div class="flex-1 flex items-center justify-center px-3" style="margin-top: 27px;">
-        <div class="h-0.5 w-full bg-slate-800 relative">
-          <div class="absolute inset-0 bg-blue-500 w-0 transition-all duration-500" id="line-3"></div>
-        </div>
-      </div>
+              <!-- Router -->
+              <div id="step-router" class="flex flex-col items-center opacity-50" style="width:60px;">
+                <div class="w-10 h-10 rounded-md border-2 border-slate-700 bg-slate-900 flex items-center justify-center mb-1">
+                  <span style="font-size:20px;">🔀</span>
+                </div>
+                <span class="text-micro uppercase tracking-wider text-slate-500">Route</span>
+              </div>
 
-      <!-- Inference Step -->
-      <div id="step-llm" class="flex flex-col items-center justify-start transition-all duration-300 opacity-50" style="width: 80px; height: 78px;">
-        <div class="w-14 h-14 rounded-lg border-2 border-slate-700 bg-slate-900 flex items-center justify-center mb-1.5 shadow-lg relative transition-all duration-300">
-          <span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 28px; line-height: 1;">⚙</span>
-          <div id="active-provider-badge" class="absolute -top-2 -right-2 bg-green-500 text-black text-micro px-1 rounded font-bold hidden">GROQ</div>
-        </div>
-        <span class="uppercase tracking-wider font-semibold text-slate-500" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 16px; font-size: 9px; line-height: 1; text-align: center;">Inference</span>
-      </div>
+              <div class="h-4 w-0.5 bg-slate-800 my-1 relative">
+                <div id="line-3" class="absolute top-0 left-0 w-full h-0 bg-blue-500 transition-all duration-500"></div>
+              </div>
 
-    </div>
-  </div>
-</div>
-          
-          <!-- Current Step Display -->
-          <div class="border-t border-slate-700/50 pt-2">
-            <div id="execution-log" class="bg-slate-900/50 rounded p-3 h-24 flex items-center justify-center text-center">
-              <div class="text-sm text-slate-300 font-medium">Ready. Select a scenario or enter a custom prompt.</div>
+              <!-- Inference -->
+              <div id="step-llm" class="flex flex-col items-center opacity-50" style="width:60px;">
+                <div class="w-10 h-10 rounded-md border-2 border-slate-700 bg-slate-900 flex items-center justify-center mb-1 relative">
+                  <span style="font-size:20px;">⚙</span>
+                  <div id="active-provider-badge"
+                       class="absolute -top-1 -right-1 bg-green-500 text-black text-micro px-1 rounded font-bold hidden">
+                    GROQ
+                  </div>
+                </div>
+                <span class="text-micro uppercase tracking-wider text-slate-500">Infer</span>
+              </div>
             </div>
+
+            <!-- Status / Execution Log (Right Side) -->
+            <div class="flex-1">
+              <div id="execution-log"
+                   class="bg-slate-900/50 rounded p-3 h-full flex items-center justify-center text-center">
+                <div class="text-sm text-slate-300 font-medium">
+                  Ready. Select a scenario or enter a custom prompt.
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -716,48 +712,48 @@ DASHBOARD_HTML = """
       const target = steps[stepId];
       if (!target || !target.node) return;
 
-      // 1. STATE: RUNNING (Pulse the node)
+      // 1. STATE: RUNNING (Flash the node)
       if (status === 'running') {
         target.node.classList.remove('opacity-50');
-        target.node.classList.add('active', 'pulse-highlight');
-        
+        target.node.classList.add('active', 'flash-highlight');
+
         // If it's the Guard node, ensure it's not red from previous run
         const iconBox = target.node.querySelector('div');
         iconBox.classList.remove('border-red-500', 'shadow-red-500/50');
         iconBox.classList.add('border-blue-500');
       }
 
-      // 2. STATE: PASS (Fill the line to the next node)
+      // 2. STATE: PASS (Fill the line downward to the next node)
       else if (status === 'pass') {
-        target.node.classList.remove('pulse-highlight');
+        target.node.classList.remove('flash-highlight');
         // Solidify the active state
         const iconBox = target.node.querySelector('div');
         iconBox.classList.add('bg-slate-800', 'border-blue-400');
 
-        // Fill the connecting line to the right with delay for proper sequencing
+        // Fill the connecting line downward with delay for proper sequencing
         if (target.line) {
           setTimeout(() => {
-            target.line.style.width = '100%';
+            target.line.style.height = '100%';
           }, 400);
         }
       }
 
       // 3. STATE: BLOCKED (Turn Red, Stop Line)
       else if (status === 'block' || status === 'fail') {
-        target.node.classList.remove('pulse-highlight');
-        
+        target.node.classList.remove('flash-highlight');
+
         // Turn the icon box RED
         const iconBox = target.node.querySelector('div');
         iconBox.classList.remove('border-slate-700', 'border-blue-500', 'group-[.active]:border-blue-500');
         iconBox.classList.add('border-red-500', 'shadow-lg', 'shadow-red-500/20');
-        
+
         // Change Icon to X (Optional)
         const iconText = iconBox.querySelector('span');
         if(iconText) iconText.innerText = '🚫';
 
         // DO NOT fill the line. The flow stops here.
         if (target.line) {
-          target.line.style.width = '0%';
+          target.line.style.height = '0%';
           target.line.classList.add('bg-red-500'); // Turn the nub red
         }
       }
@@ -775,10 +771,10 @@ DASHBOARD_HTML = """
 
     // Helper to reset the visuals before a new run
     function clearPipelineVisuals() {
-      // Reset Lines
+      // Reset Lines (vertical)
       ['line-1', 'line-2', 'line-3'].forEach(id => {
         const el = document.getElementById(id);
-        if(el) { el.style.width = '0%'; el.classList.remove('bg-red-500'); }
+        if(el) { el.style.height = '0%'; el.classList.remove('bg-red-500'); }
       });
 
       // Reset Nodes
