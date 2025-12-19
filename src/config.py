@@ -261,7 +261,7 @@ DASHBOARD_HTML = """
           <div class="relative z-10 flex gap-3">
 
             <!-- Vertical Lifecycle -->
-            <div class="flex flex-col justify-between" style="min-width:120px;height:140px;">
+            <div class="flex flex-col justify-between" style="min-width:120px;height:170px;">
 
               <!-- Auth -->
               <div id="step-auth" class="flex items-center gap-2 opacity-50">
@@ -296,7 +296,7 @@ DASHBOARD_HTML = """
             <!-- Status / Execution Log (Right Side) -->
             <div class="flex-1">
               <div id="execution-log"
-                   class="bg-slate-900/50 rounded p-1 h-full overflow-y-auto" style="max-height:140px;">
+                   class="bg-slate-900/50 rounded p-1 h-full overflow-y-auto" style="max-height:170px; min-height:170px;">
                 <div class="text-xs text-slate-300 font-medium text-center">
                   Ready. Select a scenario or enter a custom prompt.
                 </div>
