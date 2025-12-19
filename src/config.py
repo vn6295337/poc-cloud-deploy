@@ -267,7 +267,7 @@ DASHBOARD_HTML = """
               <div id="step-auth" class="flex items-center gap-2 opacity-50">
                 <span class="text-xs uppercase tracking-wider text-slate-500 w-12 text-right">Auth</span>
                 <div class="w-12 h-12 rounded border border-slate-700 bg-slate-900 flex items-center justify-center" style="padding:0;">
-                  <span style="font-size:30px;line-height:30px;height:30px;display:inline-block;vertical-align:middle;">🔑</span>
+                  <span style="font-size:26px;line-height:26px;height:26px;display:inline-block;vertical-align:middle;">🔑</span>
                 </div>
               </div>
 
@@ -275,7 +275,7 @@ DASHBOARD_HTML = """
               <div id="step-guard" class="flex items-center gap-2 opacity-50">
                 <span class="text-xs uppercase tracking-wider text-slate-500 w-12 text-right">Guard</span>
                 <div class="w-12 h-12 rounded border border-slate-700 bg-slate-900 flex items-center justify-center" style="padding:0;">
-                  <span style="font-size:30px;line-height:30px;height:30px;display:inline-block;vertical-align:middle;">🛡️</span>
+                  <span style="font-size:26px;line-height:26px;height:26px;display:inline-block;vertical-align:middle;">🛡️</span>
                 </div>
               </div>
 
@@ -283,7 +283,7 @@ DASHBOARD_HTML = """
               <div id="step-router" class="flex items-center gap-2 opacity-50">
                 <span class="text-xs uppercase tracking-wider text-slate-500 w-12 text-right">Route</span>
                 <div class="w-12 h-12 rounded border border-slate-700 bg-slate-900 flex items-center justify-center" style="padding:0;">
-                  <span style="font-size:30px;line-height:30px;height:30px;display:inline-block;vertical-align:middle;">🔀</span>
+                  <span style="font-size:26px;line-height:26px;height:26px;display:inline-block;vertical-align:middle;">🔀</span>
                 </div>
               </div>
 
@@ -291,7 +291,7 @@ DASHBOARD_HTML = """
               <div id="step-llm" class="flex items-center gap-2 opacity-50">
                 <span class="text-xs uppercase tracking-wider text-slate-500 w-12 text-right">Infer</span>
                 <div class="w-12 h-12 rounded border border-slate-700 bg-slate-900 flex items-center justify-center relative" style="padding:0;">
-                  <span style="font-size:30px;line-height:30px;height:30px;display:inline-block;vertical-align:middle;">⚙</span>
+                  <span style="font-size:26px;line-height:26px;height:26px;display:inline-block;vertical-align:middle;">⚙</span>
                   <div id="active-provider-badge"
                        class="absolute -top-1 -right-1 bg-green-500 text-black px-1 rounded font-bold hidden"
                        style="font-size:7px;">
@@ -305,7 +305,7 @@ DASHBOARD_HTML = """
             <div class="flex-1">
               <div id="execution-log"
                    class="bg-slate-900/50 rounded p-3 h-full overflow-y-auto" style="max-height:200px;">
-                <div class="text-sm text-slate-300 font-medium text-center">
+                <div class="text-xs text-slate-300 font-medium text-center">
                   Ready. Select a scenario or enter a custom prompt.
                 </div>
               </div>
@@ -763,9 +763,9 @@ DASHBOARD_HTML = """
         // Reset Icon Text (in case we changed it to 🚫)
         const span = box.querySelector('span');
         if(span) {
-          span.style.fontSize = '30px';
-          span.style.lineHeight = '30px';
-          span.style.height = '30px';
+          span.style.fontSize = '26px';
+          span.style.lineHeight = '26px';
+          span.style.height = '26px';
           span.style.display = 'inline-block';
           span.style.verticalAlign = 'middle';
           if(id === 'step-auth') span.innerText = '🔑';
@@ -784,11 +784,16 @@ DASHBOARD_HTML = """
       // Increment counter
       statusMessageCounter++;
 
-      // Build numbered message
-      const numberedMessage = `${statusMessageCounter}. ${message}`;
+      // Build message with embedded scenario number (only if in batch mode)
+      let finalMessage;
+      if (isBatchMode && currentScenarioNum > 0 && batchTotal > 0) {
+        finalMessage = `${statusMessageCounter}. [Scenario ${currentScenarioNum}/${batchTotal}] ${message}`;
+      } else {
+        finalMessage = `${statusMessageCounter}. ${message}`;
+      }
 
       // Add to array
-      statusMessages.push(numberedMessage);
+      statusMessages.push(finalMessage);
 
       // Limit to MAX_STATUS_LINES (keep most recent)
       if (statusMessages.length > MAX_STATUS_LINES) {
@@ -797,15 +802,14 @@ DASHBOARD_HTML = """
 
       // Build HTML with top-left alignment
       const statusHTML = `
-        <div class="text-sm text-slate-300 text-left">
-          <div class="font-semibold mb-2">[Scenario ${currentScenarioNum}/${batchTotal}]</div>
+        <div class="text-xs text-slate-300 text-left">
           <div class="space-y-0.5">
             ${statusMessages.map(msg => `<div>${msg}</div>`).join('')}
           </div>
         </div>
       `;
 
-      // Update executionLog (still replaces, but with accumulated content)
+      // Update executionLog
       executionLog.innerHTML = statusHTML;
 
       // Auto-scroll to bottom
@@ -1006,130 +1010,72 @@ DASHBOARD_HTML = """
 
     // Display batch metrics in status area
     function displayBatchMetricsInStatus(startMetrics) {
-      clearStatusForMetrics(); // Clear accumulated messages
-
       const failuresInBatch = sessionMetrics.modelFailures - startMetrics.modelFailures;
       const downtimeInBatch = sessionMetrics.downtimePrevented - startMetrics.downtimePrevented;
 
-      // Build simplified metrics HTML
-      const metricsHTML = `
-        <div class="text-sm text-slate-300 text-left">
-          <div class="space-y-1">
-            <div>Model Failures Handled: <strong>${failuresInBatch}</strong></div>
-            <div>Downtime Prevented: <strong>${downtimeInBatch} min</strong></div>
-            <div>System Uptime: <strong>100%</strong></div>
-          </div>
-        </div>
-      `;
-
-      // Display in execution log (status area)
-      executionLog.innerHTML = metricsHTML;
+      // Add separator and metrics using appendLog
+      appendLog('═'.repeat(60));
+      appendLog(`Model Failures Handled: ${failuresInBatch}`);
+      appendLog(`Downtime Prevented: ${downtimeInBatch} min`);
+      appendLog(`System Uptime: 100%`);
     }
 
     // Display security metrics after batch security test
     function displaySecurityMetrics(startMetrics) {
-      clearStatusForMetrics(); // Clear accumulated messages
-
       const blockedInBatch = securityMetrics.adversarialBlocked - startMetrics.adversarialBlocked;
       const piiInBatch = securityMetrics.piiLeaksPrevented - startMetrics.piiLeaksPrevented;
       const totalBlocked = blockedInBatch + piiInBatch;
       const finesAvoided = securityMetrics.complianceFinesAvoided - startMetrics.complianceFinesAvoided;
 
-      const metricsHTML = `
-        <div class="text-sm text-slate-300 text-left">
-          <div class="space-y-1">
-            <div>Total Threats Blocked: <strong>${totalBlocked}/4</strong></div>
-            <div>Adversarial Attempts Blocked: <strong>${blockedInBatch}</strong></div>
-            <div>PII Leaks Prevented: <strong>${piiInBatch}</strong></div>
-            <div>Compliance Fines Avoided: <strong>$${finesAvoided.toLocaleString()}</strong></div>
-          </div>
-        </div>
-      `;
-
-      executionLog.innerHTML = metricsHTML;
+      appendLog('═'.repeat(60));
+      appendLog(`Total Threats Blocked: ${totalBlocked}/4`);
+      appendLog(`Adversarial Attempts Blocked: ${blockedInBatch}`);
+      appendLog(`PII Leaks Prevented: ${piiInBatch}`);
+      appendLog(`Compliance Fines Avoided: $${finesAvoided.toLocaleString()}`);
     }
 
     // Display cost optimization metrics after batch cost test
     function displayCostMetrics(results) {
-      clearStatusForMetrics(); // Clear accumulated messages
-
       const totalSavings = results.reduce((sum, r) => sum + r.annualSavings, 0);
 
-      let metricsHTML = `
-        <div class="text-sm text-slate-300 text-left">
-          <div class="space-y-3">
-      `;
+      appendLog('═'.repeat(60));
 
       results.forEach((result, index) => {
-        metricsHTML += `
-          <div class="border-t border-slate-700 pt-2">
-            <div class="font-semibold text-slate-200 mb-1">${result.scenario}</div>
-            <div class="space-y-0.5 text-xs">
-              <div>Selected: <strong>${result.selectedModel}</strong> (\$${result.selectedPrice.toFixed(2)}/1M)</div>
-              <div>Premium Alt: <strong>${result.premiumModel}</strong> (\$${result.premiumPrice.toFixed(2)}/1M)</div>
-              <div>Cost per Request: <strong>\$${result.costPerRequest.toFixed(4)}</strong> (${result.savingsPercent.toFixed(0)}% savings)</div>
-              <div>Annual Savings: <strong>\$${result.annualSavings.toLocaleString()}</strong></div>
-            </div>
-          </div>
-        `;
+        appendLog(`─ ${result.scenario} ─`);
+        appendLog(`  Selected: ${result.selectedModel} ($${result.selectedPrice.toFixed(2)}/1M)`);
+        appendLog(`  Premium Alt: ${result.premiumModel} ($${result.premiumPrice.toFixed(2)}/1M)`);
+        appendLog(`  Cost per Request: $${result.costPerRequest.toFixed(4)} (${result.savingsPercent.toFixed(0)}% savings)`);
+        appendLog(`  Annual Savings: $${result.annualSavings.toLocaleString()}`);
       });
 
-      metricsHTML += `
-            <div class="border-t-2 border-emerald-500 pt-2 mt-2">
-              <div class="text-base font-bold text-emerald-400">Total Annual Savings: \$${totalSavings.toLocaleString()}</div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      executionLog.innerHTML = metricsHTML;
+      appendLog('─'.repeat(60));
+      appendLog(`Total Annual Savings: $${totalSavings.toLocaleString()}`);
     }
 
     // Display performance metrics after batch performance test
     function displayPerformanceMetrics(results) {
-      clearStatusForMetrics(); // Clear accumulated messages
-
       const avgGatewayTTFT = results.reduce((sum, r) => sum + r.gatewayTTFT, 0) / results.length;
       const avgIndustryTTFT = results.reduce((sum, r) => sum + r.industryTTFT, 0) / results.length;
       const productivityBuffer = ((avgIndustryTTFT - avgGatewayTTFT) / avgIndustryTTFT) * 100;
       const totalRequests = results.reduce((sum, r) => sum + r.requestsPerDay, 0);
-      const timeSavedPerDay = ((avgIndustryTTFT - avgGatewayTTFT) * totalRequests) / 1000 / 60; // minutes
+      const timeSavedPerDay = ((avgIndustryTTFT - avgGatewayTTFT) * totalRequests) / 1000 / 60;
 
-      let metricsHTML = `
-        <div class="text-sm text-slate-300 text-left">
-          <div class="space-y-3">
-      `;
+      appendLog('═'.repeat(60));
 
       results.forEach((result, index) => {
-        metricsHTML += `
-          <div class="border-t border-slate-700 pt-2">
-            <div class="font-semibold text-slate-200 mb-1">${result.scenario}</div>
-            <div class="space-y-0.5 text-xs">
-              <div>Selected Model: <strong>${result.selectedModel}</strong></div>
-              <div>Avg Response Start: <strong>${result.gatewayTTFT}ms</strong> (vs ${result.industryTTFT}ms industry avg)</div>
-              <div>Speed Improvement: <strong>${result.speedup.toFixed(0)}% faster</strong></div>
-              <div>Daily Requests: <strong>${result.requestsPerDay.toLocaleString()}</strong></div>
-            </div>
-          </div>
-        `;
+        appendLog(`─ ${result.scenario} ─`);
+        appendLog(`  Model: ${result.selectedModel}`);
+        appendLog(`  Avg Response Start: ${result.gatewayTTFT}ms (vs ${result.industryTTFT}ms industry avg)`);
+        appendLog(`  Speed Improvement: ${result.speedup.toFixed(0)}% faster`);
+        appendLog(`  Daily Requests: ${result.requestsPerDay.toLocaleString()}`);
       });
 
-      metricsHTML += `
-            <div class="border-t-2 border-blue-500 pt-2 mt-2">
-              <div class="text-base font-bold text-blue-400 mb-1">Performance Summary</div>
-              <div class="space-y-0.5 text-xs">
-                <div>Avg Gateway TTFT: <strong>${Math.round(avgGatewayTTFT)}ms</strong></div>
-                <div>Avg Industry TTFT: <strong>${Math.round(avgIndustryTTFT)}ms</strong></div>
-                <div>Productivity Buffer: <strong>${productivityBuffer.toFixed(1)}% faster</strong></div>
-                <div>Time Saved Daily: <strong>${timeSavedPerDay.toFixed(1)} minutes</strong></div>
-                <div>Annual Productivity Gain: <strong>${(timeSavedPerDay * 250 / 60).toFixed(0)} hours/year</strong></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      executionLog.innerHTML = metricsHTML;
+      appendLog('─'.repeat(60));
+      appendLog(`Avg Gateway TTFT: ${Math.round(avgGatewayTTFT)}ms`);
+      appendLog(`Avg Industry TTFT: ${Math.round(avgIndustryTTFT)}ms`);
+      appendLog(`Productivity Buffer: ${productivityBuffer.toFixed(1)}% faster`);
+      appendLog(`Time Saved Daily: ${timeSavedPerDay.toFixed(1)} minutes`);
+      appendLog(`Annual Productivity Gain: ${(timeSavedPerDay * 250 / 60).toFixed(0)} hours/year`);
     }
 
     // Batch resilience test - runs 2 scenarios with different prompts
@@ -1768,7 +1714,7 @@ DASHBOARD_HTML = """
 
       // Reset execution log to ready message
       executionLog.innerHTML = `
-        <div class="text-sm text-slate-300 font-medium text-center">
+        <div class="text-xs text-slate-300 font-medium text-center">
           Ready. Select a scenario or enter a custom prompt.
         </div>
       `;
