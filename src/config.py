@@ -1012,7 +1012,7 @@ DASHBOARD_HTML = """
       const finesAvoided = securityMetrics.complianceFinesAvoided - startMetrics.complianceFinesAvoided;
 
       appendLog('═'.repeat(60));
-      appendLog(`Total Threats Blocked: ${totalBlocked}/4`);
+      appendLog(`Total Threats Blocked: ${totalBlocked}`);
       appendLog(`Adversarial Attempts Blocked: ${blockedInBatch}`);
       appendLog(`PII Leaks Prevented: ${piiInBatch}`);
       appendLog(`Compliance Fines Avoided: $${finesAvoided.toLocaleString()}`);
