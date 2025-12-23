@@ -644,9 +644,12 @@
     };
 
     // Check if execution should pause at this point
-    async function checkPausePoint() {
-      // Check if scenario was aborted
-      if (pauseState.currentScenario && buttonStates[pauseState.currentScenario] === 'ready') {
+    // scenarioKey parameter allows checking if THIS specific scenario was aborted
+    async function checkPausePoint(scenarioKey = null) {
+      const keyToCheck = scenarioKey || pauseState.currentScenario;
+
+      // Check if this scenario was aborted (state reset to 'ready')
+      if (keyToCheck && buttonStates[keyToCheck] === 'ready') {
         throw new Error('ScenarioAborted');
       }
 
@@ -1116,18 +1119,18 @@
 
       // Run 2 scenarios sequentially
       for (let i = 1; i <= 2; i++) {
-        await checkPausePoint();  // Pause checkpoint
+        await checkPausePoint('normal');  // Pause checkpoint
         currentScenarioNum = i;
 
         // Show progress header
         addCommentary('');
         addCommentary(`> SCENARIO ${i}/2`);
 
-        await checkPausePoint();  // Pause checkpoint before execution
+        await checkPausePoint('normal');  // Pause checkpoint before execution
         // Execute scenario with custom prompt
         await runScenario('normal', scenarioPrompts[i - 1]);
 
-        await checkPausePoint();  // Pause checkpoint after execution
+        await checkPausePoint('normal');  // Pause checkpoint after execution
         // Pause between scenarios for readability
         await new Promise(r => setTimeout(r, 2000));
       }
@@ -1161,7 +1164,7 @@
 
       // Run 4 security test scenarios sequentially
       for (let i = 1; i <= 4; i++) {
-        await checkPausePoint();  // Pause checkpoint
+        await checkPausePoint('injection');  // Pause checkpoint
         currentScenarioNum = i;
 
         // Show progress header
@@ -1169,15 +1172,17 @@
         addCommentary(`> SECURITY TEST ${i}/4`);
 
         try {
-          await checkPausePoint();  // Pause checkpoint before execution
+          await checkPausePoint('injection');  // Pause checkpoint before execution
           // Execute scenario with adversarial prompt
           await runScenario('injection', getAdversarialPrompt(i));
         } catch (error) {
+          // Re-throw abort errors to stop the batch
+          if (error.message === 'ScenarioAborted') throw error;
           console.error(`Error in scenario ${i}:`, error);
           addCommentary(`Error in scenario ${i}: ${error.message}`);
         }
 
-        await checkPausePoint();  // Pause checkpoint after execution
+        await checkPausePoint('injection');  // Pause checkpoint after execution
         // Pause between scenarios for readability
         await new Promise(r => setTimeout(r, 2000));
       }
@@ -1210,7 +1215,7 @@
 
       // Run 2 cost scenarios sequentially
       for (let i = 0; i < scenarios.length; i++) {
-        await checkPausePoint();  // Pause checkpoint
+        await checkPausePoint('cost');  // Pause checkpoint
         currentScenarioNum = i + 1;
         const scenarioData = COST_MODELS[scenarios[i].key];
 
@@ -1219,7 +1224,7 @@
         addCommentary(`> COST SCENARIO ${i + 1}/2: ${scenarios[i].name.toUpperCase()}`);
 
         try {
-          await checkPausePoint();  // Pause checkpoint before execution
+          await checkPausePoint('cost');  // Pause checkpoint before execution
           // Execute cost scenario
           await runScenario('cost', scenarioData.prompt);
 
@@ -1248,11 +1253,13 @@
           addCommentary(`+ Premium Alt: ${scenarioData.premium.name} (\$${scenarioData.premium.price.toFixed(2)}/1M)`);
           addCommentary(`+ Annual Savings: \$${annualSavings.toLocaleString()}`);
         } catch (error) {
+          // Re-throw abort errors to stop the batch
+          if (error.message === 'ScenarioAborted') throw error;
           console.error(`Error in cost scenario ${i + 1}:`, error);
           addCommentary(`Error in scenario ${i + 1}: ${error.message}`);
         }
 
-        await checkPausePoint();  // Pause checkpoint after execution
+        await checkPausePoint('cost');  // Pause checkpoint after execution
         // Pause between scenarios for readability
         await new Promise(r => setTimeout(r, 2500));
       }
@@ -1285,7 +1292,7 @@
 
       // Run 2 performance scenarios sequentially
       for (let i = 0; i < scenarios.length; i++) {
-        await checkPausePoint();  // Pause checkpoint
+        await checkPausePoint('performance');  // Pause checkpoint
         currentScenarioNum = i + 1;
         const scenarioData = PERFORMANCE_BENCHMARKS[scenarios[i].key];
 
@@ -1294,7 +1301,7 @@
         addCommentary(`> PERFORMANCE TEST ${i + 1}/2: ${scenarios[i].name.toUpperCase()}`);
 
         try {
-          await checkPausePoint();  // Pause checkpoint before execution
+          await checkPausePoint('performance');  // Pause checkpoint before execution
           // Execute performance scenario
           await runScenario('performance', scenarioData.prompt);
 
@@ -1318,11 +1325,13 @@
           addCommentary(`+ Response Start: ${simulatedTTFT}ms (vs ${scenarioData.industryAvgTTFT}ms industry avg)`);
           addCommentary(`+ Speed Improvement: ${speedup.toFixed(0)}% faster`);
         } catch (error) {
+          // Re-throw abort errors to stop the batch
+          if (error.message === 'ScenarioAborted') throw error;
           console.error(`Error in performance scenario ${i + 1}:`, error);
           addCommentary(`Error in scenario ${i + 1}: ${error.message}`);
         }
 
-        await checkPausePoint();  // Pause checkpoint after execution
+        await checkPausePoint('performance');  // Pause checkpoint after execution
         // Pause between scenarios for readability
         await new Promise(r => setTimeout(r, 2500));
       }
@@ -1339,7 +1348,7 @@
     // Scenario runner
     async function runScenario(scenarioKey, customPrompt = null) {
       // Early abort check
-      await checkPausePoint();
+      await checkPausePoint(scenarioKey);
 
       const scenario = SCENARIOS[scenarioKey];
       if (!scenario) return;
@@ -1464,7 +1473,7 @@
       
       // Run steps
       for (const step of scenario.steps) {
-        await checkPausePoint();  // Pause checkpoint before each step
+        await checkPausePoint(scenarioKey);  // Pause checkpoint before each step
 
         // Execute action first to check if it's a fallback scenario
         const result = step.action();
@@ -1483,7 +1492,7 @@
           updatePipelineVisual(step.id, 'running');
           appendLog(getDetailedStepMessage(step.id, 'running', context));
           await new Promise(r => setTimeout(r, 1200));
-          await checkPausePoint();  // Pause checkpoint after step animation
+          await checkPausePoint(scenarioKey);  // Pause checkpoint after step animation
         }
 
         if (result.status === 'pass') {
@@ -1499,7 +1508,7 @@
           lastRunData.steps.push({id: step.id, status: 'pass'});
           // Allow time for connector line animation to complete
           await new Promise(r => setTimeout(r, 600));
-          await checkPausePoint();  // Pause checkpoint after pass
+          await checkPausePoint(scenarioKey);  // Pause checkpoint after pass
         } else if (result.status === 'block' || result.status === 'fail') {
           updatePipelineVisual(step.id, 'block');
           // Add appropriate commentary
@@ -1533,7 +1542,7 @@
           let failedModelsInThisTest = 0;
 
           for (const p of result.path) {
-            await checkPausePoint();  // Pause checkpoint before each provider attempt
+            await checkPausePoint(scenarioKey);  // Pause checkpoint before each provider attempt
 
             const [providerModel, outcome] = p.split(':');
             const parsed = parseProviderModel(providerModel);
@@ -1551,14 +1560,14 @@
             };
             appendLog(getDetailedStepMessage('router', 'running', routerContext));
             await new Promise(r => setTimeout(r, 1000));
-            await checkPausePoint();  // Pause checkpoint after router animation
+            await checkPausePoint(scenarioKey);  // Pause checkpoint after router animation
 
             // Light up the provider badge (based on base provider)
             if (baseProvider === 'gemini') lightProvider('gemini', outcome, outcome==='success'?120:0);
             if (baseProvider === 'groq') lightProvider('groq', outcome, outcome==='success'?87:0);
             if (baseProvider === 'openrouter') lightProvider('open', outcome, outcome==='success'?200:0);
             await new Promise(r => setTimeout(r, 800));
-            await checkPausePoint();  // Pause checkpoint after provider badge
+            await checkPausePoint(scenarioKey);  // Pause checkpoint after provider badge
 
             lastRunData.providerPath.push({provider: fullDisplayName, outcome});
 
@@ -1587,7 +1596,7 @@
                 routerNode.classList.add('opacity-50');
               }
               await new Promise(r => setTimeout(r, 600));
-              await checkPausePoint();  // Pause checkpoint after provider failure
+              await checkPausePoint(scenarioKey);  // Pause checkpoint after provider failure
             } else if (outcome === 'success') {
               // Model succeeded - router passes, then show inferencing
               addCommentary(`Attempting ${fullDisplayName}... Success!`);
@@ -1599,7 +1608,7 @@
               appendLog(getDetailedStepMessage('router', 'pass', passContext));
               updatePipelineVisual('router', 'pass');
               await new Promise(r => setTimeout(r, 800));
-              await checkPausePoint();  // Pause checkpoint after router success
+              await checkPausePoint(scenarioKey);  // Pause checkpoint after router success
 
               // Now show inferencing (provider step)
               updatePipelineVisual('provider', 'running');
@@ -1609,7 +1618,7 @@
               };
               appendLog(getDetailedStepMessage('provider', 'running', inferenceContext));
               await new Promise(r => setTimeout(r, 1200));
-              await checkPausePoint();  // Pause checkpoint after inferencing animation
+              await checkPausePoint(scenarioKey);  // Pause checkpoint after inferencing animation
 
               // Inferencing complete
               lastRunData.provider = fullDisplayName;
