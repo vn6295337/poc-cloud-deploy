@@ -11,7 +11,7 @@ from slowapi.util import get_remote_address
 from pydantic import BaseModel
 
 from ..models import QueryRequest, QueryResponse, HealthResponse
-from ..security import validate_api_key, detect_pii, detect_prompt_injection
+from ..security import validate_api_key, detect_pii, detect_prompt_injection, detect_toxicity
 from ..llm.client import llm_client
 from ..config import RATE_LIMIT, SERVICE_API_KEY
 from ..metrics import metrics
@@ -229,4 +229,23 @@ async def batch_security_test(batch: BatchRequest):
         "injection_attempts_blocked": injection_attempts,
         "compliance_fines_avoided_usd": compliance_fines_avoided,
         "results": results
+    }
+
+
+class ToxicityRequest(BaseModel):
+    text: str
+
+
+@router.post("/check-toxicity")
+async def check_toxicity(request: ToxicityRequest):
+    """
+    Check text for toxic content using Perspective API.
+    Returns toxicity scores and blocked categories.
+    """
+    result = detect_toxicity(request.text)
+    return {
+        "is_toxic": result["is_toxic"],
+        "scores": result["scores"],
+        "blocked_categories": result["blocked_categories"],
+        "error": result["error"]
     }

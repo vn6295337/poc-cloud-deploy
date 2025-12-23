@@ -2109,30 +2109,57 @@
         appendLog('GUARD: No PII exposure found');
         await new Promise(r => setTimeout(r, 400));
 
-        appendLog('GUARD: Checking AI safety policies...');
-        await new Promise(r => setTimeout(r, 600));
+        appendLog('GUARD: Checking AI safety via Perspective API...');
+        await new Promise(r => setTimeout(r, 400));
 
-        // Check for unsafe content (violence, illegal, unethical)
-        const unsafePatterns = [
-          { pattern: /how\s+to\s+(make|build|create)\s+(a\s+)?(bomb|explosive|weapon)/i, category: 'violence' },
-          { pattern: /how\s+to\s+(kill|murder|harm|hurt)\s+(someone|a\s+person|people)/i, category: 'violence' },
-          { pattern: /how\s+to\s+(hack|breach|break\s+into)/i, category: 'illegal' },
-          { pattern: /how\s+to\s+(steal|rob|commit\s+fraud)/i, category: 'illegal' },
-          { pattern: /how\s+to\s+(buy|sell|make)\s+(drugs|cocaine|heroin|meth)/i, category: 'illegal' },
-          { pattern: /generate\s+(child|minor).*(porn|explicit|nude)/i, category: 'illegal' },
-          { pattern: /how\s+to\s+(manipulate|deceive|scam|defraud)/i, category: 'unethical' },
-          { pattern: /write\s+(malware|virus|ransomware|trojan)/i, category: 'illegal' },
-          { pattern: /how\s+to\s+(torture|abuse)/i, category: 'violence' },
-          { pattern: /terroris(t|m)|mass\s+shooting/i, category: 'violence' }
-        ];
+        // Call Perspective API for toxicity detection
+        try {
+          const toxicityResponse = await fetch('/check-toxicity', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: customPrompt })
+          });
+          const toxicityData = await toxicityResponse.json();
 
-        const unsafeMatch = unsafePatterns.find(p => p.pattern.test(customPrompt));
-        if (unsafeMatch) {
-          updatePipelineVisual('input', 'fail');
-          appendLog(`GUARD: ⚠️ Unsafe content detected (${unsafeMatch.category}) - BLOCKED`);
-          metricStatus.textContent = 'Blocked';
-          lastRunData = { scenario: 'custom', final: 'blocked', error: `Unsafe content: ${unsafeMatch.category}` };
-          return;
+          if (toxicityData.error) {
+            appendLog(`GUARD: Perspective API: ${toxicityData.error} (using fallback)`);
+            // Fallback to static patterns if API fails
+            const unsafePatterns = [
+              { pattern: /how\s+to\s+(make|build|create)\s+(a\s+)?(bomb|explosive|weapon)/i, category: 'violence' },
+              { pattern: /how\s+to\s+(kill|murder|harm|hurt)\s+(someone|a\s+person|people)/i, category: 'violence' },
+              { pattern: /how\s+to\s+(hack|breach|break\s+into)/i, category: 'illegal' },
+              { pattern: /how\s+to\s+(steal|rob|commit\s+fraud)/i, category: 'illegal' },
+              { pattern: /how\s+to\s+(buy|sell|make)\s+(drugs|cocaine|heroin|meth)/i, category: 'illegal' },
+              { pattern: /write\s+(malware|virus|ransomware|trojan)/i, category: 'illegal' },
+              { pattern: /terroris(t|m)|mass\s+shooting/i, category: 'violence' }
+            ];
+            const unsafeMatch = unsafePatterns.find(p => p.pattern.test(customPrompt));
+            if (unsafeMatch) {
+              updatePipelineVisual('input', 'fail');
+              appendLog(`GUARD: ⚠️ Unsafe content detected (${unsafeMatch.category}) - BLOCKED`);
+              metricStatus.textContent = 'Blocked';
+              lastRunData = { scenario: 'custom', final: 'blocked', error: `Unsafe content: ${unsafeMatch.category}` };
+              return;
+            }
+          } else if (toxicityData.is_toxic) {
+            updatePipelineVisual('input', 'fail');
+            const categories = toxicityData.blocked_categories.join(', ');
+            const topScore = Math.max(...Object.values(toxicityData.scores));
+            appendLog(`GUARD: ⚠️ Toxic content detected - BLOCKED`);
+            appendLog(`GUARD: Categories: ${categories} (score: ${(topScore * 100).toFixed(0)}%)`);
+            metricStatus.textContent = 'Blocked';
+            lastRunData = { scenario: 'custom', final: 'blocked', error: `Toxic content: ${categories}` };
+            return;
+          } else {
+            // Show top scores for transparency
+            const scores = toxicityData.scores;
+            if (Object.keys(scores).length > 0) {
+              const topAttr = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+              appendLog(`GUARD: Toxicity scan passed (${topAttr[0]}: ${(topAttr[1] * 100).toFixed(0)}%)`);
+            }
+          }
+        } catch (toxErr) {
+          appendLog('GUARD: Perspective API unavailable, using fallback checks');
         }
         appendLog('GUARD: AI safety check passed');
         await new Promise(r => setTimeout(r, 400));

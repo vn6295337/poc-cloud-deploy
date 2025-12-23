@@ -4,6 +4,7 @@ Security utilities for the LLM Secure Gateway
 
 import os
 import re
+import requests
 from fastapi import HTTPException, Depends, status
 from fastapi.security import APIKeyHeader
 
@@ -65,3 +66,86 @@ async def validate_api_key(api_key: str = Depends(api_key_header)):
     if api_key != SERVICE_API_KEY:
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
     return api_key
+
+
+# --- Perspective API Toxicity Detection ---
+PERSPECTIVE_API_KEY = os.getenv("PERSPECTIVE_API_KEY") or os.getenv("API_KEY")
+PERSPECTIVE_API_URL = "https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze"
+TOXICITY_THRESHOLD = float(os.getenv("TOXICITY_THRESHOLD", "0.7"))
+
+# Attributes to check with Perspective API
+PERSPECTIVE_ATTRIBUTES = {
+    "TOXICITY": {},
+    "SEVERE_TOXICITY": {},
+    "IDENTITY_ATTACK": {},
+    "INSULT": {},
+    "PROFANITY": {},
+    "THREAT": {},
+}
+
+def detect_toxicity(text: str) -> dict:
+    """
+    Detect toxic content using Google's Perspective API.
+    Returns: {is_toxic: bool, scores: dict, blocked_categories: list, error: str|None}
+    """
+    if not PERSPECTIVE_API_KEY:
+        return {
+            "is_toxic": False,
+            "scores": {},
+            "blocked_categories": [],
+            "error": "Perspective API key not configured"
+        }
+
+    try:
+        payload = {
+            "comment": {"text": text},
+            "requestedAttributes": PERSPECTIVE_ATTRIBUTES,
+            "languages": ["en"]
+        }
+
+        response = requests.post(
+            f"{PERSPECTIVE_API_URL}?key={PERSPECTIVE_API_KEY}",
+            json=payload,
+            headers={"Content-Type": "application/json"},
+            timeout=5
+        )
+
+        if response.status_code != 200:
+            return {
+                "is_toxic": False,
+                "scores": {},
+                "blocked_categories": [],
+                "error": f"Perspective API error: {response.status_code}"
+            }
+
+        data = response.json()
+        scores = {}
+        blocked_categories = []
+
+        for attr, attr_data in data.get("attributeScores", {}).items():
+            score = attr_data.get("summaryScore", {}).get("value", 0)
+            scores[attr] = round(score, 3)
+            if score >= TOXICITY_THRESHOLD:
+                blocked_categories.append(attr)
+
+        return {
+            "is_toxic": len(blocked_categories) > 0,
+            "scores": scores,
+            "blocked_categories": blocked_categories,
+            "error": None
+        }
+
+    except requests.exceptions.Timeout:
+        return {
+            "is_toxic": False,
+            "scores": {},
+            "blocked_categories": [],
+            "error": "Perspective API timeout"
+        }
+    except Exception as e:
+        return {
+            "is_toxic": False,
+            "scores": {},
+            "blocked_categories": [],
+            "error": str(e)
+        }
